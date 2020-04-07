@@ -264,7 +264,7 @@ class GameTestCase(unittest.TestCase):
         self.pg.draw_card(self.player1)
         self.assertEqual('London', self.player1.hand[0].name)
 
-    @skip('\'Player.discard_card\' known bug.')
+    @skip('\'PandemicGame.all_one_colour\' method is not provided yet.')
     def test_check_cure_disease(self):
         for i in range(9):
             self.pg.draw_card(self.player1)
@@ -279,7 +279,7 @@ class GameTestCase(unittest.TestCase):
         self.assertFalse(
             self.player1.check_cure_disease('Brighton', 'Liverpool', 'New York', 'Southampton', 'Manchester'))
 
-    @skip('\'Player.discard_card\' known bug.')
+    @skip('\'PandemicGame.all_one_colour\' method is not provided yet.')
     def test_cure_disease(self):
         self.assertFalse(self.pg.diseases['Blue'].cured)
         for i in range(15):
@@ -301,7 +301,6 @@ class GameTestCase(unittest.TestCase):
         self.player2.set_location('New York')
         self.assertFalse(self.player1.check_share_knowledge('London', self.player2))
 
-    @skip('\'Player.share_knowledge\' known bug.')
     def test_share_knowledge(self):
         self.player1.set_location('London')
         self.player2.set_location('London')
@@ -361,7 +360,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(4, self.player1.action_count)
         self.assertTrue(self.player1.check_charter_flight('London', 'Texas'))
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_charter_flight(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -378,7 +376,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(3, self.player1.action_count)
         self.assertEqual('New York', self.player1.location.name)
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_check_shuttle_flight(self):
         for i in range(30):
             self.pg.draw_card(self.player1)
@@ -389,7 +386,6 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.build_lab())
         self.assertTrue(self.player1.check_shuttle_flight('New York', 'London'))
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_shuttle_flight(self):
         for i in range(30):
             self.pg.draw_card(self.player1)
@@ -411,7 +407,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(4, self.player1.action_count)
         self.assertTrue(self.player1.check_build_lab())
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_build_lab(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -424,7 +419,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(1, len(self.pg.player_deck.discard))
         self.assertEqual('London', self.pg.player_deck.discard[0].name)
 
-    @skip('\'Player.check_direct_flight\' known bug.')
     def test_check_direct_flight(self):
         self.player1.set_location('Jinan')
         self.pg.start_turn(self.player1)
@@ -433,7 +427,6 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.hand_contains('London'))
         self.assertTrue(self.player1.check_direct_flight('Jinan', 'London'))
 
-    @skip('\'Player.check_direct_flight\' known bug.')
     def test_direct_flight(self):
         self.player1.set_location('Moscow')
         self.pg.start_turn(self.player1)
@@ -451,14 +444,12 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual('London', self.player1.location.name)
         self.assertEqual(3, self.player1.action_count)
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_check_standard_move(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
         self.assertEqual(4, self.player1.action_count)
         self.assertTrue(self.player1.check_standard_move('London', 'Brighton'))
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_standard_move(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -476,7 +467,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(2, self.player1.action_count)
         self.assertEqual('Southampton', self.player1.location.name)
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_check_long_move(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -486,7 +476,6 @@ class GameTestCase(unittest.TestCase):
         self.assertFalse(self.player1.check_long_move('Plymouth', 'Baoding'))
         self.assertFalse(self.player1.check_long_move('Baoding', 'London'))
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_long_move(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -517,7 +506,6 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.hand_contains('London'))
         self.assertFalse(self.player1.hand_contains('New York'))
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_discard_card(self):
         self.pg.draw_card(self.player1)
         self.assertEqual(1, len(self.player1.hand))
@@ -529,7 +517,7 @@ class GameTestCase(unittest.TestCase):
     def test_AIController(self):
         self.assertEqual('AIController1', self.player1.controller.name)
 
-    @skip('\'Player.discard_card\' known bug.')
+    @skip('\'PandemicGame.all_one_colour\' method is not provided yet.')
     def test_AI_cure_possible(self):
         for i in range(9):
             self.pg.draw_card(self.player1)
@@ -539,7 +527,6 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.build_lab())
         self.assertTrue(self.player1.controller.cure_possible())
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_AI_build_lab_sensible(self):
         self.player1.set_location('London')
         self.pg.start_turn(self.player1)
@@ -555,7 +542,6 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.hand_contains('Jacksonville'))
         self.assertTrue(self.player1.controller.build_lab_sensible())
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_reset_distances(self):
         self.pg.reset_distances()
         self.player1.set_location('London')
@@ -564,7 +550,7 @@ class GameTestCase(unittest.TestCase):
         self.assertTrue(self.player1.build_lab())
         self.assertEqual(999, self.pg.city_map['London'].distance)
         self.assertEqual(999, self.pg.city_map['Moscow'].distance)
-        self.pg.setLabDistances()
+        self.pg.set_lab_distances()
         self.assertNotEqual(999, self.pg.city_map['London'].distance)
         self.assertNotEqual(999, self.pg.city_map['Moscow'].distance)
         self.pg.reset_distances()
@@ -582,20 +568,17 @@ class GameTestCase(unittest.TestCase):
         self.pg.city_map['Bristol'].remove_all_cubes('Red')
         self.assertEqual(0, self.pg.city_map['Bristol'].get_cubes('Red'))
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_set_city_distance_name(self):
         self.pg.set_city_distance_name('Leeds')
         self.assertEqual(2, self.pg.city_map['London'].distance)
         self.assertEqual(3, self.pg.city_map['Moscow'].distance)
 
-    @skip('\'PandemicGame.update_distances\' known bug.')
     def test_set_cities_distances_names(self):
         cities = ['Leeds', 'Atlanta', 'Moscow']
         self.pg.set_cities_distances_names(cities)
         self.assertEqual(1, self.pg.city_map['London'].distance)
         self.assertEqual(0, self.pg.city_map['Moscow'].distance)
 
-    @skip('\'Player.discard_card\' known bug.')
     def test_set_lab_distances(self):
         for i in range(21):
             self.pg.draw_card(self.player1)
@@ -613,9 +596,9 @@ class GameTestCase(unittest.TestCase):
 
     @expectedFailure
     def test_get_inputs(self):
-        print("check_ing test inputs at start of game")
         test_inputs = self.player1.get_inputs()
         self.assertIsNotNone(test_inputs)
+        print("check_ing test inputs at start of game")
         print("check_ing first 40 inputs (0-39) for city cubes are all 0")
         for i in range(40):
             self.assertEqual(test_inputs[i],0)
