@@ -1,11 +1,126 @@
 import unittest
 from unittest import skip, expectedFailure
 
+import config
 from PandemicGame import PandemicGame
+from city import City
+from ai import AIController
 from player import Player
 
+# TODO: provide test cases for City, Deck, etc.
 
-class MyTestCase(unittest.TestCase):
+
+class GameSetupTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.settings_location = 'testSettings.cfg'
+        cls.settings = config.get_settings(cls.settings_location)
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def setUp(self):
+        self.pg = PandemicGame()
+        self.pg.settings = self.settings
+
+    def tearDown(self):
+        pass
+
+    def test_add_player(self):
+        players = [Player('Evie'), Player('Amelia')]
+
+        for player in players:
+            self.pg.add_player(player)
+
+            with self.subTest(player=player):
+                self.assertIs(self.pg, player.game)
+                self.assertIn(player, self.pg.players)
+                self.assertEqual(player.name, self.pg.players[-1].name)
+                # TODO: AIController assertions
+
+    def test_get_infection_rate(self):
+        self.pg.get_infection_rate()
+        self.assertEqual(2, self.pg.infection_rate)
+
+    def test_get_new_cities(self):
+        self.pg.get_new_cities()
+
+        self.assertIn('London', self.pg.city_map)
+        city = self.pg.city_map['London']
+        self.assertEqual('London', city.name)
+        self.assertEqual('Blue', city.colour)
+        self.assertEqual(6, len(city.connected_cities))
+        self.assertEqual('Washington', city.connected_cities[3].name)
+        self.assertEqual('Bejing', city.connected_cities[4].name)
+
+    # TODO: separate for ".make_cities" method
+
+    def test_get_new_decks(self):
+        self.pg.get_new_decks()
+
+        # TODO: these assertions should belong to Deck test cases
+        top_player_card = self.pg.player_deck.take_top_card()
+        top_infect_card = self.pg.infect_deck.take_top_card()
+        self.assertEqual('London', top_player_card.name)
+        self.assertEqual('London', top_infect_card.name)
+        self.assertEqual('Blue', top_player_card.colour)
+        self.assertEqual('Blue', top_infect_card.colour)
+
+    def test_get_new_diseases(self):
+        self.pg.get_new_diseases()
+
+        self.assertEqual('Red', self.pg.diseases['Red'].colour)
+        self.assertEqual(30, self.pg.disease_cubes['Blue'])
+
+    def test_set_starting_epidemics(self):
+        self.pg.set_starting_epidemics()
+        self.assertEqual(4, self.pg.starting_epidemics)
+
+    def test_setup_game(self):
+        del self.pg.settings
+
+        players = [Player('Evie'), Player('Amelia')]
+        for player in players:
+            self.pg.add_player(player)
+
+        self.pg.setup_game(self.settings_location)
+
+        self.assertEqual(self.pg.settings, self.settings)
+
+        self.assertEqual(0, self.pg.epidemic_count)
+        self.assertEqual(0, self.pg.outbreak_count)
+        self.assertFalse(self.pg.game_won)
+        self.assertFalse(self.pg.game_over)
+
+        self.assertIn('Yellow', City.cube_colours)
+        City.cube_colours = []
+
+        self.assertEqual(2, self.pg.infection_rate)
+
+        self.assertIn('New York', self.pg.city_map)
+        self.newyork = self.pg.city_map['New York']
+        self.assertEqual('New York', self.newyork.name)
+        self.assertEqual('Yellow', self.newyork.colour)
+        self.assertEqual(3, len(self.newyork.connected_cities))
+
+        top_player_card = self.pg.player_deck.take_top_card()
+        top_infect_card = self.pg.infect_deck.take_top_card()
+        self.assertEqual('London', top_player_card.name)
+        self.assertEqual('London', top_infect_card.name)
+
+        self.assertEqual('Red', self.pg.diseases['Red'].colour)
+        self.assertEqual(30, self.pg.disease_cubes['Black'])
+
+        self.assertEqual(4, self.pg.starting_epidemics)
+
+        self.assertEqual('London', players[0].location.name)
+        self.assertEqual('London', players[1].location.name)
+
+        self.assertEqual(0, AIController.number_AI)
+
+
+class GameTestCase(unittest.TestCase):
     def setUp(self):
         self.settings_location = 'testSettings.cfg'
         self.player1 = Player('Evie')
@@ -35,60 +150,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(0, self.pg.city_map['Bristol'].get_cubes('Blue'))
         self.assertEqual('Bristol', self.player1.location.name)
 
-    def test_add_player(self):
-        self.assertEqual(self.pg, self.player1.game)
-
-    def test_add_disease_cubes(self):
-        self.assertEqual(30, self.pg.disease_cubes['Red'])
-        self.assertEqual(30, self.pg.disease_cubes['Blue'])
-
-    def test_setup_game(self):
-        self.london = self.pg.city_map['London']
-        self.newyork = self.pg.city_map['New York']
-        self.top_player_card = self.pg.player_deck.take_top_card()
-        self.top_infect_card = self.pg.infect_deck.take_top_card()
-        self.assertEqual(30, self.pg.disease_cubes['Red'])
-        self.assertEqual(30, self.pg.disease_cubes['Blue'])
-        self.assertEqual('Evie', self.pg.players[0].name)
-        self.assertEqual('Amelia', self.pg.players[1].name)
-        self.assertFalse(self.pg.game_won)
-        self.assertFalse(self.pg.game_over)
-        self.assertEqual('London', self.london.name)
-        self.assertEqual(6, len(self.london.connected_cities))
-        self.assertEqual('Blue', self.london.colour)
-        self.assertEqual('New York', self.newyork.name)
-        self.assertEqual(3, len(self.newyork.connected_cities))
-        self.assertEqual('Yellow', self.newyork.colour)
-        self.assertEqual(2, self.pg.infection_rate)
-        self.assertEqual(0, self.pg.epidemic_count)
-        self.assertEqual(0, self.pg.outbreak_count)
-        self.assertEqual('London', self.top_player_card.name)
-        self.assertEqual('London', self.top_infect_card.name)
-        self.assertEqual('Blue', self.top_player_card.colour)
-        self.assertEqual('Blue', self.top_infect_card.colour)
-        self.assertEqual('London', self.pg.players[0].location.name)
-        self.assertEqual('London', self.pg.players[1].location.name)
-
-    def test_get_new_decks(self):
-        self.pg.get_new_decks()
-        top_player_card = self.pg.player_deck.take_top_card()
-        top_infect_card = self.pg.infect_deck.take_top_card()
-        self.assertEqual('London', top_player_card.name)
-        self.assertEqual('London', top_infect_card.name)
-
     def test_add_card(self):
         top_player_card = self.pg.player_deck.take_top_card()
         self.player1.add_card(top_player_card)
         self.assertEqual(1, len(self.player1.hand))
         self.assertTrue(self.player1.hand_contains('London'))
-
-    def test_get_new_cities(self):
-        self.pg.get_new_cities()
-        city1 = self.pg.city_map['London']
-        self.assertEqual(6, len(city1.connected_cities))
-        self.assertEqual('Blue', city1.colour)
-        self.assertEqual('Washington', city1.connected_cities[3].name)
-        self.assertEqual('Bejing', city1.connected_cities[4].name)
 
     def test_infect_city(self):
         self.pg.infect_city('London', 'Blue')
@@ -101,9 +167,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(2, len(self.pg.infect_deck.discard))
         self.assertEqual('London', self.pg.infect_deck.discard[0].name)
         self.assertEqual(28, self.pg.disease_cubes['Blue'])
-
-    def test_get_infection_rate(self):
-        self.assertEqual(2, self.pg.infection_rate)
 
     def test_epidemic_phase(self):
         self.pg.epidemic_phase()
