@@ -552,7 +552,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_inputs(self):
         print("check_ing test inputs at start of game")
         test_inputs = self.player1.get_inputs()
-        self.assertTrue(test_inputs is not None)
+        self.assertIsNotNone(test_inputs)
         print("check_ing first 40 inputs (0-39) for city cubes are all 0")
         for i in range(40):
             self.assertEqual(test_inputs[i],0)
@@ -588,7 +588,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(1, test_inputs[158])
         print("check_ing number of research stations in each location is to 0")
         for i in range(159, 199):
-            self.assertEqual(test_inputs[i], 0.975)
+            self.assertAlmostEqual(test_inputs[i], 0.975)
         print("checking each disease is set to uncured")
         for i in range(200, 203):
             self.assertEqual(test_inputs[i], 0)
@@ -635,10 +635,10 @@ class MyTestCase(unittest.TestCase):
         for i in range(9, 40):
             self.assertEqual(test_inputs[i],0)
         print("check_ing inputs (40-46 for player1 potential cards are all 0")
-        self.assertEqual(0.975, test_inputs[41])
-        self.assertEqual(0.95, test_inputs[42])
-        self.assertEqual(0.925, test_inputs[43])
-        self.assertEqual(0.9, test_inputs[44])
+        self.assertAlmostEqual(0.975, test_inputs[41])
+        self.assertAlmostEqual(0.95, test_inputs[42])
+        self.assertAlmostEqual(0.925, test_inputs[43])
+        self.assertAlmostEqual(0.9, test_inputs[44])
         for i in range(45, 53):
             self.assertEqual(test_inputs[i], 0)
         print("check_ing inputs (47-53 for player2 potential cards are all 0")
