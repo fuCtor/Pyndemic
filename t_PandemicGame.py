@@ -6,12 +6,48 @@ import random
 import config
 from PandemicGame import PandemicGame
 from city import City
+from disease import Disease
 from card import Card, PlayerCard, InfectCard
 from deck import Deck, PlayerDeck, InfectDeck
 from ai import AIController
 from player import Player
 
-# TODO: provide test cases for City, Deck, etc.
+# TODO: provide test cases for City, Player, AiController classes.
+
+
+class ConfigModuleTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.settings_location = 'testSettings.cfg'
+
+    def setUp(self):
+        config._CACHED_SETTINGS = None
+
+    def test_refresh_settings(self):
+        config.refresh_settings(self.settings_location)
+        settings = config._CACHED_SETTINGS
+
+        self.assertIsNotNone(settings)
+        self.assertEqual('Tianjin', settings['Cities']['city21'])
+        self.assertEqual(['20', '22', '23'], settings['Connections']['Tianjin'].split())
+        self.assertEqual('Red', settings['City Colours']['city21'])
+        self.assertEqual('Black', settings['Diseases']['disease4'])
+        self.assertEqual('2222334', settings['Other']['rate'])
+
+    def test_get_settings(self):
+        settings = config.get_settings(self.settings_location)
+
+        self.assertIsNotNone(config._CACHED_SETTINGS)
+        self.assertIs(config._CACHED_SETTINGS, settings)
+
+        settings_again = config.get_settings(self.settings_location)
+        self.assertIs(settings, settings_again)
+
+        settings_reloaded = config.get_settings(self.settings_location, refresh=True)
+        self.assertIs(config._CACHED_SETTINGS, settings_reloaded)
+        self.assertIsNot(settings_reloaded, settings)
+        self.assertEqual(settings['Cities']['city9'],
+                         settings_reloaded['Cities']['city9'])
 
 
 class CardTestCase(TestCase):
@@ -19,6 +55,13 @@ class CardTestCase(TestCase):
         card = Card('London', 'Blue')
         self.assertEqual('London', card.name)
         self.assertEqual('Blue', card.colour)
+
+
+class DiseaseTestCase(TestCase):
+    def test_init(self):
+        disease = Disease('Blue')
+        self.assertEqual('Blue', disease.colour)
+        self.assertFalse(disease.cured)
 
 
 class DeckTestCase(TestCase):
@@ -32,9 +75,6 @@ class DeckTestCase(TestCase):
             Card('New York', 'Yellow'),
         ]
         self.deck.cards = self.test_cards.copy()
-
-    def tearDown(self):
-        pass
 
     def test_prepare(self):
         with self.assertRaises(NotImplementedError):
@@ -81,15 +121,8 @@ class PlayerDeckTestCase(TestCase):
         cls.settings_location = 'testSettings.cfg'
         cls.settings = config.get_settings(cls.settings_location)
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
     def setUp(self):
         self.deck = PlayerDeck()
-
-    def tearDown(self):
-        pass
 
     def test_prepare(self):
         self.deck.prepare(self.settings)
@@ -124,15 +157,8 @@ class InfectDeckTestCase(TestCase):
         cls.settings_location = 'testSettings.cfg'
         cls.settings = config.get_settings(cls.settings_location)
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
     def setUp(self):
         self.deck = InfectDeck()
-
-    def tearDown(self):
-        pass
 
     def test_prepare(self):
         self.deck.prepare(self.settings)
@@ -168,16 +194,9 @@ class GameSetupTestCase(TestCase):
         cls.settings_location = 'testSettings.cfg'
         cls.settings = config.get_settings(cls.settings_location)
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
     def setUp(self):
         self.pg = PandemicGame()
         self.pg.settings = self.settings
-
-    def tearDown(self):
-        pass
 
     def test_add_player(self):
         players = [Player('Evie'), Player('Amelia')]
@@ -211,13 +230,13 @@ class GameSetupTestCase(TestCase):
     def test_get_new_decks(self):
         self.pg.get_new_decks()
 
-        # TODO: these assertions should belong to Deck test cases
-        top_player_card = self.pg.player_deck.take_top_card()
-        top_infect_card = self.pg.infect_deck.take_top_card()
-        self.assertEqual('London', top_player_card.name)
-        self.assertEqual('London', top_infect_card.name)
-        self.assertEqual('Blue', top_player_card.colour)
-        self.assertEqual('Blue', top_infect_card.colour)
+        deck = self.pg.player_deck
+        self.assertEqual('London', deck.cards[0].name)
+        self.assertEqual('Black', deck.cards[29].colour)
+
+        deck = self.pg.infect_deck
+        self.assertEqual('London', deck.cards[0].name)
+        self.assertEqual('Black', deck.cards[29].colour)
 
     def test_get_new_diseases(self):
         self.pg.get_new_diseases()
@@ -408,9 +427,15 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(9, len(self.pg.infect_deck.discard))
         self.assertEqual(12, self.pg.disease_cubes['Blue'])
 
-    def test_draw_initial_hands(self):
-        self.pg.start_game()
-        # TODO: assertions
+    def test_draw_inital_hands(self):
+        test_cards = self.pg.player_deck.cards[:8]
+        # TODO: fix typo in method name
+        self.pg.draw_inital_hands()
+
+        for i, player in enumerate(self.pg.players):
+            with self.subTest(i=i, player=player):
+                self.assertEqual(4, len(player.hand))
+                self.assertEqual(test_cards[i * 4 + 3].name, player.hand[3].name)
 
     def test_draw_card(self):
         self.pg.draw_card(self.player1)
