@@ -14,6 +14,9 @@ class ConfigModuleTestCase(TestCase):
     def setUp(self):
         config._CACHED_SETTINGS = None
 
+    def tearDown(self):
+        config._CACHED_SETTINGS = None
+
     def test_refresh_settings(self):
         config.refresh_settings(SETTINGS_LOCATION)
         settings = config._CACHED_SETTINGS

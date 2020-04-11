@@ -14,7 +14,7 @@ from deck import Deck, PlayerDeck, InfectDeck
 from ai import AIController
 from player import Player
 
-# TODO: provide test cases for City, Player, AiController classes.
+# TODO: provide test cases for City and Player classes.
 
 
 SETTINGS_LOCATION = op.join(op.dirname(__file__), 'testSettings.cfg')
@@ -39,7 +39,9 @@ class GameSetupTestCase(TestCase):
                 self.assertIs(self.pg, player.game)
                 self.assertIn(player, self.pg.players)
                 self.assertEqual(player.name, self.pg.players[-1].name)
-                # TODO: AIController assertions
+                self.assertEqual(len(self.pg.players), AIController.number_AI)
+
+        AIController.number_AI = 0
 
     def test_get_infection_rate(self):
         self.pg.get_infection_rate()
@@ -119,7 +121,7 @@ class GameSetupTestCase(TestCase):
         self.assertEqual('London', players[0].location.name)
         self.assertEqual('London', players[1].location.name)
 
-        self.assertEqual(0, AIController.number_AI)
+        self.assertEqual(2, AIController.number_AI)
 
 
 class GameTestCase(unittest.TestCase):
@@ -520,34 +522,6 @@ class GameTestCase(unittest.TestCase):
         self.assertEqual(0, len(self.player1.hand))
         self.assertEqual(1, len(self.pg.player_deck.discard))
         self.assertEqual('London', self.pg.player_deck.discard[0].name)
-
-    def test_AIController(self):
-        self.assertEqual('AIController1', self.player1.controller.name)
-
-    @skip('\'PandemicGame.all_one_colour\' method is not provided yet.')
-    def test_AI_cure_possible(self):
-        for i in range(9):
-            self.pg.draw_card(self.player1)
-        self.player1.set_location('London')
-        self.pg.start_turn(self.player1)
-        self.assertEqual(4, self.player1.action_count)
-        self.assertTrue(self.player1.build_lab())
-        self.assertTrue(self.player1.controller.cure_possible())
-
-    def test_AI_build_lab_sensible(self):
-        self.player1.set_location('London')
-        self.pg.start_turn(self.player1)
-        self.pg.draw_card(self.player1)
-        self.assertTrue(self.player1.hand_contains('London'))
-        self.assertFalse(self.pg.city_map['London'].has_lab)
-        self.assertEqual(4, self.player1.action_count)
-        self.assertTrue(self.player1.build_lab())
-        self.player1.set_location('Jacksonville')
-        for i in range(21):
-            self.pg.draw_card(self.player1)
-        self.assertEqual(6, self.player1.get_distance_from_lab())
-        self.assertTrue(self.player1.hand_contains('Jacksonville'))
-        self.assertTrue(self.player1.controller.build_lab_sensible())
 
     def test_reset_distances(self):
         self.pg.reset_distances()
