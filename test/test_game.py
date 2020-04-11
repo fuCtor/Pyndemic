@@ -1,6 +1,8 @@
+# coding: utf-8
 import unittest
 from unittest import TestCase, skip, expectedFailure
 
+import os.path as op
 import random
 
 import config
@@ -15,184 +17,13 @@ from player import Player
 # TODO: provide test cases for City, Player, AiController classes.
 
 
-class ConfigModuleTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.settings_location = 'testSettings.cfg'
-
-    def setUp(self):
-        config._CACHED_SETTINGS = None
-
-    def test_refresh_settings(self):
-        config.refresh_settings(self.settings_location)
-        settings = config._CACHED_SETTINGS
-
-        self.assertIsNotNone(settings)
-        self.assertEqual('Tianjin', settings['Cities']['city21'])
-        self.assertEqual(['20', '22', '23'], settings['Connections']['Tianjin'].split())
-        self.assertEqual('Red', settings['City Colours']['city21'])
-        self.assertEqual('Black', settings['Diseases']['disease4'])
-        self.assertEqual('2222334', settings['Other']['rate'])
-
-    def test_get_settings(self):
-        settings = config.get_settings(self.settings_location)
-
-        self.assertIsNotNone(config._CACHED_SETTINGS)
-        self.assertIs(config._CACHED_SETTINGS, settings)
-
-        settings_again = config.get_settings(self.settings_location)
-        self.assertIs(settings, settings_again)
-
-        settings_reloaded = config.get_settings(self.settings_location, refresh=True)
-        self.assertIs(config._CACHED_SETTINGS, settings_reloaded)
-        self.assertIsNot(settings_reloaded, settings)
-        self.assertEqual(settings['Cities']['city9'],
-                         settings_reloaded['Cities']['city9'])
-
-
-class CardTestCase(TestCase):
-    def test_init(self):
-        card = Card('London', 'Blue')
-        self.assertEqual('London', card.name)
-        self.assertEqual('Blue', card.colour)
-
-
-class DiseaseTestCase(TestCase):
-    def test_init(self):
-        disease = Disease('Blue')
-        self.assertEqual('Blue', disease.colour)
-        self.assertFalse(disease.cured)
-
-
-class DeckTestCase(TestCase):
-    def setUp(self):
-        self.deck = Deck()
-        self.test_cards = [
-            Card('London', 'Blue'),
-            Card('Washington', 'Yellow'),
-            Card('Bejing', 'Red'),
-            Card('Moskow', 'Black'),
-            Card('New York', 'Yellow'),
-        ]
-        self.deck.cards = self.test_cards.copy()
-
-    def test_prepare(self):
-        with self.assertRaises(NotImplementedError):
-            self.deck.prepare('fake settings')
-
-    def test_take_top_card(self):
-        card = self.deck.take_top_card()
-        self.assertEqual('London', card.name)
-
-        next_card = self.deck.take_top_card()
-        self.assertEqual('Yellow', next_card.colour)
-
-    def test_take_bottom_card(self):
-        card = self.deck.take_bottom_card()
-        self.assertEqual('Yellow', card.colour)
-
-        next_card = self.deck.take_bottom_card()
-        self.assertEqual('Moskow', next_card.name)
-
-    def test_add_card(self):
-        new_card = Card('Cherepovets', 'Black')
-        self.deck.add_card(new_card)
-
-        self.assertEqual('Cherepovets', self.deck.cards[-1].name)
-
-    def test_add_discard(self):
-        discarded_card = Card('Cherepovets', 'Black')
-        self.deck.add_discard(discarded_card)
-
-        self.assertEqual('Cherepovets', self.deck.discard[-1].name)
-
-    def test_shuffle(self):
-        random.seed(42)
-        random.shuffle(self.test_cards)
-
-        random.seed(42)
-        self.deck.shuffle()
-        self.assertEqual(self.test_cards, self.deck.cards)
-
-
-class PlayerDeckTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.settings_location = 'testSettings.cfg'
-        cls.settings = config.get_settings(cls.settings_location)
-
-    def setUp(self):
-        self.deck = PlayerDeck()
-
-    def test_prepare(self):
-        self.deck.prepare(self.settings)
-
-        self.assertIsInstance(self.deck.cards[10], PlayerCard)
-        self.assertEqual('London', self.deck.cards[0].name)
-        self.assertEqual('Black', self.deck.cards[29].colour)
-
-    @skip('Known bug in method.')
-    def test_multiple_prepare(self):
-        self.deck.prepare(self.settings)
-        deck_size = len(self.deck.cards)
-
-        self.deck.prepare(self.settings)
-        self.assertEqual(deck_size, len(self.deck.cards))
-
-    def test_add_epidemics(self):
-        self.deck.prepare(self.settings)
-
-        random.seed(42)
-        self.deck.add_epidemics(6)
-
-        self.assertEqual(46, len(self.deck.cards))
-        self.assertEqual('Epidemic', self.deck.cards[13].name)
-        self.assertEqual('Epidemic', self.deck.cards[24].name)
-        self.assertEqual('London', self.deck.cards[33].name)
-
-
-class InfectDeckTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.settings_location = 'testSettings.cfg'
-        cls.settings = config.get_settings(cls.settings_location)
-
-    def setUp(self):
-        self.deck = InfectDeck()
-
-    def test_prepare(self):
-        self.deck.prepare(self.settings)
-
-        self.assertIsInstance(self.deck.cards[10], InfectCard)
-        self.assertEqual('London', self.deck.cards[0].name)
-        self.assertEqual('Black', self.deck.cards[29].colour)
-
-    @skip('Known bug in method.')
-    def test_multiple_prepare(self):
-        self.deck.prepare(self.settings)
-        deck_size = len(self.deck.cards)
-
-        self.deck.prepare(self.settings)
-        self.assertEqual(deck_size, len(self.deck.cards))
-
-    def test_shuffle_discard_to_top(self):
-        self.deck.prepare(self.settings)
-        for i in range(10):
-            self.deck.add_discard(self.deck.take_top_card())
-
-        random.seed(42)
-        self.deck.shuffle_discard_to_top()
-
-        self.assertFalse(self.deck.discard)
-        self.assertEqual('London', self.deck.cards[8].name)
-        self.assertEqual('Washington', self.deck.cards[10].name)
+SETTINGS_LOCATION = op.join(op.dirname(__file__), 'testSettings.cfg')
 
 
 class GameSetupTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.settings_location = 'testSettings.cfg'
-        cls.settings = config.get_settings(cls.settings_location)
+        cls.settings = config.get_settings(SETTINGS_LOCATION, refresh=True)
 
     def setUp(self):
         self.pg = PandemicGame()
@@ -255,7 +86,7 @@ class GameSetupTestCase(TestCase):
         for player in players:
             self.pg.add_player(player)
 
-        self.pg.setup_game(self.settings_location)
+        self.pg.setup_game(SETTINGS_LOCATION)
 
         self.assertEqual(self.pg.settings, self.settings)
 
@@ -293,13 +124,12 @@ class GameSetupTestCase(TestCase):
 
 class GameTestCase(unittest.TestCase):
     def setUp(self):
-        self.settings_location = 'testSettings.cfg'
         self.player1 = Player('Evie')
         self.player2 = Player('Amelia')
         self.pg = PandemicGame()
         self.pg.add_player(self.player1)
         self.pg.add_player(self.player2)
-        self.pg.setup_game(self.settings_location)
+        self.pg.setup_game(SETTINGS_LOCATION)
 
     def test_add_epidemics(self):
         self.pg.add_epidemics()
