@@ -7,7 +7,7 @@ import os.path as op
 import config
 
 
-SETTINGS_LOCATION = op.join(op.dirname(__file__), 'testSettings.cfg')
+SETTINGS_LOCATION = op.join(op.dirname(__file__), 'test_settings.cfg')
 
 
 class ConfigModuleTestCase(TestCase):

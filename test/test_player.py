@@ -17,7 +17,7 @@ from player import Player
 # TODO: provide test cases for City and Player classes.
 
 
-SETTINGS_LOCATION = op.join(op.dirname(__file__), 'testSettings.cfg')
+SETTINGS_LOCATION = op.join(op.dirname(__file__), 'test_settings.cfg')
 
 
 class PlayerTestCase(TestCase):

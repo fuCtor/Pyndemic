@@ -11,7 +11,7 @@ from card import Card, PlayerCard, InfectCard
 from deck import Deck, PlayerDeck, InfectDeck
 
 
-SETTINGS_LOCATION = op.join(op.dirname(__file__), 'testSettings.cfg')
+SETTINGS_LOCATION = op.join(op.dirname(__file__), 'test_settings.cfg')
 
 
 class DeckTestCase(TestCase):
