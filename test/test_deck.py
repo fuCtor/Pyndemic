@@ -21,7 +21,7 @@ class DeckTestCase(TestCase):
             Card('London', 'Blue'),
             Card('Washington', 'Yellow'),
             Card('Bejing', 'Red'),
-            Card('Moskow', 'Black'),
+            Card('Moscow', 'Black'),
             Card('New York', 'Yellow'),
         ]
         self.deck.cards = self.test_cards.copy()
@@ -42,7 +42,7 @@ class DeckTestCase(TestCase):
         self.assertEqual('Yellow', card.colour)
 
         next_card = self.deck.take_bottom_card()
-        self.assertEqual('Moskow', next_card.name)
+        self.assertEqual('Moscow', next_card.name)
 
     def test_add_card(self):
         new_card = Card('Cherepovets', 'Black')
