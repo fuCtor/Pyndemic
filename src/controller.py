@@ -3,6 +3,7 @@ import sys
 import itertools as its
 import random
 import logging
+import i18n
 
 from .game import *
 from .city import NoCityCubesException
@@ -22,11 +23,11 @@ class MainController:
         if random_state is not None:
             random.seed(random_state)
             logging.info(
-                f'Random state is fixed ({random_state})')
+                i18n.t('main.seed', seed=str(random_state)))
 
     def run(self):
         logging.info(
-            'Starting game for 4 players.')
+            i18n.t('main.start_game', count=4))
 
         self.player_names = names = ['Alpha', 'Bravo', 'Charlie', 'Delta']
         self.players = players = {name: Player(name) for name in names}
@@ -43,15 +44,15 @@ class MainController:
             self.game_cycle()
         except LastDiseaseCuredException as e:
             logging.warning(e)
-            logging.warning('Game won!')
+            logging.warning(i18n.t('main.game_won'))
         except GameCrisisException as e:
             logging.warning(e)
-            logging.warning('Game lost!')
+            logging.warning(i18n.t('main.game_lost'))
         except KeyboardInterrupt:
             logging.warning(
-                'You decided to exit the game...')
+                i18n.t('main.exit_decide'))
 
-        logging.info('---<<< Thats all! >>>---')
+        logging.info(i18n.t('main.thats_all'))
 
     def game_cycle(self):
         name_cycle = its.cycle(self.player_names)
@@ -60,20 +61,20 @@ class MainController:
         while True:
             player = self.player = self.players[next(name_cycle)]
             logging.info(
-                f'Active player: {player.name}')
+                i18n.t('main.active_player', name=player.name))
 
             game.start_turn(player)
 
             while player.action_count:
                 logging.info(
-                    f'Actions left: {player.action_count}')
+                    i18n.t('main.actions_left', count=player.action_count))
 
                 command = self.input()
                 if not command:
                     continue
 
                 logging.debug(
-                    'Player action: ' + command)
+                    i18n.t('main.player_action', command=command))
                 command = command.split()
 
                 chosen_executor = None
@@ -84,7 +85,7 @@ class MainController:
                         break
                 if not chosen_executor:
                     logging.error(
-                        'Command cannot be parsed. Type a correct command.')
+                        i18n.t('main.command_parse_fail'))
                     continue
 
                 try:
@@ -94,24 +95,24 @@ class MainController:
                     success = False
                 if not success:
                     logging.error(
-                        'Command cannot be executed. Type some other command.')
+                        i18n.t('main.command_execute_fail'))
                 continue
 
                 logging.info(
-                    'Command successfully executed.')
+                    i18n.t('main.command_executed'))
 
             logging.info(
-                'No actions left. Now getting cards...')
+                i18n.t('main.no_actions_left'))
 
             # TODO: this must be a game method
             for i in range(2):
                 game.draw_card(player)
 
             logging.info(
-                'Cards drawn. Now starting infect phase.')
+                i18n.t('main.cards_drawn'))
 
             game.infect_city_phase()
 
             logging.info(
-                'Infect phase gone. Starting new turn.')
+                i18n.t('main.infected_phase_gone'))
 

@@ -1,0 +1,35 @@
+en:
+    api:
+        prompt: 'Type your command: '
+        no_more_commands: 'No more commands in file input!'
+        using_file_mode: 'Using file input mode.'
+        using_console_mode: 'Using console input mode.'
+    
+    city:
+        __str__: 'City %{name} (%{colour})'
+        created: 'Created location %{city}'
+        no_cubes_left: 'No %{colour} cubes left in %{city}!'            
+        built: built
+        not_build: not built
+        info: 'City %{name} (colour: %{colour}, total neighbours: %{cities}, laboratory: %{has_lab}'
+        remove_cube: 'Removed %{colour} cube from %{city}'
+        add_cube: 'Added %{colour} cube to %{city}'
+        build_lab: 'Built laboratory in %{city}'
+        remove_all_cubes: 'Removed all %{colour} cubes from %{city}'
+    
+    main:
+        seed: 'Random state is fixed (%{seed})'
+        start_game: 'Starting game for %{count} players.'
+        game_won: 'Game won!'
+        game_lost: 'Game lost!'
+        exit_decide: 'You decided to exit the game...'
+        thats_all: '---<<< Thats all! >>>---'
+        active_player: 'Active player: %{name}'
+        actions_left: 'Actions left: %{count}'
+        player_action: 'Player action: %{command}'
+        command_parse_fail: 'Command cannot be parsed. Type a correct command.'
+        command_execute_fail: 'Command cannot be executed. Type some other command.'
+        command_executed: 'Command successfully executed.'
+        no_actions_left: 'No actions left. Now getting cards...'
+        cards_drawn: 'Cards drawn. Now starting infect phase.'
+        infected_phase_gone: 'Infect phase gone. Starting new turn.'

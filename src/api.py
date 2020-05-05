@@ -1,6 +1,7 @@
 # coding: utf-8
 from abc import ABCMeta, abstractmethod
 import logging
+import i18n
 
 
 class InputManager(metaclass=ABCMeta):
@@ -14,7 +15,7 @@ class ConsoleInputManager(InputManager):
         pass
 
     def __call__(self):
-        command = input('Type your command: ')
+        command = input(i18n.t('api.prompt'))
         return command
 
 
@@ -29,7 +30,7 @@ class FileInputManager(InputManager):
             command = self._cached.pop().rstrip()
         except IndexError:
             raise IndexError(
-                'No more commands in file input!')
+                i18n.t('api.no_more_commands'))
 
         return command
 
@@ -40,10 +41,10 @@ class HybridInputManager(InputManager):
 
         if self.input_mode == 'file':
             self.input = FileInputManager(input_file)
-            logging.info('Using file input mode.')
+            logging.info(i18n.t('api.using_file_mode'))
         else:
             self.input = ConsoleInputManager()
-            logging.info('Using console input mode.')
+            logging.info(i18n.t('api.using_console_mode'))
 
     def __call__(self):
         try:

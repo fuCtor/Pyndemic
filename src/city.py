@@ -1,5 +1,6 @@
 # coding: utf-8
 import logging
+import i18n
 
 from .exceptions import GameException
 
@@ -10,7 +11,7 @@ class NoCityCubesException(GameException):
         self.colour = colour
 
     def __str__(self):
-        return f'No {self.colour} cubes left in {self.city.name}!'
+        return i18n.t('city.no_cubes_left', colour=self.colour, city=self.city.name)
 
 
 class City:
@@ -22,15 +23,15 @@ class City:
         self.distance = 999
         self.connected_cities = []
         logging.debug(
-            f'Created location {self}')
+            i18n.t('city.created', city=str(self)))
 
     def __str__(self):
-        return f'City {self.name} ({self.colour})'
+        return i18n.t('city.__str__', name=self.name, colour=self.colour)
 
     def info(self):
-        has_lab = 'built' if self.has_lab else 'not built'
-        result = (f'City {self.name} (colour: {self.colour}, total neighbours:'
-                  f' {len(self.connected_cities)}, laboratory: {has_lab})')
+        has_lab = i18n.t('city.built') if self.has_lab else i18n.t('city.not_built')
+        result = (i18n.t('city.info_prompt', 
+            name=self.name, colour=self.colour, cities=len(self.connected_cities), has_lab=has_lab))
 
         return result
 
@@ -43,19 +44,19 @@ class City:
             raise NoCityCubesException(self, colour)
         self.cubes[colour] -= 1
         logging.debug(
-            f'Removed {colour} cube from {self}')
+            i18n.t('city.remove_cube', colour=colour, city=str(self)))
 
     def add_cube(self, colour):
         self.cubes[colour] += 1
         logging.debug(
-            f'Added {colour} cube to {self}')
+            i18n.t('city.add_cube', colour=colour, city=str(self)))
 
     def build_lab(self):
         if self.has_lab:
             return False
         self.has_lab = True
         logging.debug(
-            f'Built laboratory in {self}')
+            i18n.t('city.build_lab', city=str(self)))
 
         return True
 
@@ -69,7 +70,7 @@ class City:
         dropped_cubes = self.cubes[colour]
         self.cubes[colour] = 0
         logging.debug(
-            f'Removed all {colour} cubes from {self}')
+            i18n.t('city.remove_all_cubes', colour=colour, city=str(self)))
 
         return dropped_cubes
 

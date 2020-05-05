@@ -1,0 +1,35 @@
+ru:
+    api:
+        prompt: 'Введите команду: '
+        no_more_commands: 'No more commands in file input!'
+        using_file_mode: 'Using file input mode.'
+        using_console_mode: 'Using console input mode.'
+    
+    city:
+        __str__: 'Город %{name} (%{colour})'
+        created: 'Создана локация %{city}'
+        no_cubes_left: 'No %{colour} cubes left in %{city}!'            
+        built: построен
+        not_build: не построен
+        info: 'Город %{name} (цвет: %{colour}, всего соседей: %{cities}, лаборатория: %{has_lab}'
+        remove_cube: 'Удален %{colour} куб из %{city}'
+        add_cube: 'Добавлен %{colour} куб в %{city}'
+        build_lab: 'Построена лаборатория в %{city}'
+        remove_all_cubes: 'Удалены все %{colour} кубики из %{city}'
+
+    main:
+        seed: 'Случайное исло зафиксировано (%{seed})'
+        start_game: 'Начинаем игру для %{count} участников.'
+        game_won: 'Игра выиграна!'
+        game_lost: 'Игра проиграна!'
+        exit_decide: 'Вы решили покинуть игру...'
+        thats_all: '---<<< На этом все! >>>---'
+        active_player: 'Активный участник: %{name}'
+        actions_left: 'Ходов оталось: %{count}'
+        player_action: 'Действие участника: %{command}'
+        command_parse_fail: 'Команда не может быть разобрана. Введите корректную команду.'
+        command_execute_fail: 'Команда не может быть выполнена. Введите другую команду.'
+        command_executed: 'Команда успешно выполнена.'
+        no_actions_left: 'Действия законичлись. Берите карты...'
+        cards_drawn: 'Карты нарисованы. Начинается фаза заражения.'
+        infected_phase_gone: 'Фаза заражения прошла. Начинается новый раунд.'
