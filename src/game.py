@@ -1,6 +1,8 @@
 # coding: utf-8
 import logging
 
+from collections import OrderedDict
+
 from . import config
 from .exceptions import GameCrisisException
 from .city import City
@@ -8,14 +10,6 @@ from .card import Card
 from .deck import PlayerDeck, InfectDeck
 from .disease import Disease
 from .player import Player
-
-
-class NullDiseaseCapacityException(GameCrisisException):
-    def __init__(self, colour):
-        self.colour = colour
-
-    def __str__(self):
-        return f'No {self.colour} disease cubes left!'
 
 
 class ExhaustedPlayerDeckException(GameCrisisException):
@@ -34,8 +28,7 @@ class Game:
         self.outbreak_count = 0
         self.game_over = False
         self.game_won = False
-        self.disease_cubes = {}
-        self.city_map = {}
+        self.city_map = OrderedDict()
         self.player_deck = PlayerDeck()
         self.infect_deck = InfectDeck()
         self.infection_rate = None
@@ -50,11 +43,10 @@ class Game:
 
     def setup_game(self, settings_location=None):
         self.settings = config.get_settings(settings_location)
-        City.set_cube_colours(self.settings)
         self.get_infection_rate()
+        self.get_new_diseases()
         self.get_new_cities()
         self.get_new_decks()
-        self.get_new_diseases()
         self.set_starting_epidemics()
 
         logging.info(
@@ -133,12 +125,7 @@ class Game:
         logging.info(
             f'Infecting {infected_city} with {colour} disease.')
         if infected_city.cubes[colour] < 3:
-            if self.disease_cubes[colour] == 0:
-                raise NullDiseaseCapacityException(colour)
-            self.disease_cubes[colour] -= 1
-            logging.debug(
-                (f'{colour} disease capacity is now '
-                 f'{self.disease_cubes[colour]}.'))
+            self.diseases[colour].decrease_resistance(1)
             infected_city.add_cube(colour)
             logging.info(
                 (f'Infected {infected_city} with {colour} disease (reached '
@@ -231,11 +218,13 @@ class Game:
     def get_new_cities(self):
         cities_section = self.settings['Cities']
         city_colours_section = self.settings['City Colours']
+        cube_colours = list(self.diseases.keys())
 
         for city_id in cities_section:
             city_name = cities_section[city_id]
             city_colour = city_colours_section[city_id]
             new_city = City(city_name, city_colour)
+            new_city.init_colours(cube_colours)
             self.city_map[city_name] = new_city
 
         self.make_cities()
@@ -243,8 +232,8 @@ class Game:
             'Created city graph.')
 
     def get_new_decks(self):
-        self.player_deck.prepare(self.settings)
-        self.infect_deck.prepare(self.settings)
+        self.player_deck.prepare(self.city_map.values())
+        self.infect_deck.prepare(self.city_map.values())
         logging.debug(
             'Decks prepared.')
 
@@ -254,8 +243,7 @@ class Game:
 
         for disease_id in diseases_section:
             disease_colour = diseases_section[disease_id]
-            self.diseases[disease_colour] = Disease(disease_colour)
-            self.disease_cubes[disease_colour] = number_of_cubes
+            self.diseases[disease_colour] = Disease(disease_colour, number_of_cubes)
 
     def make_cities(self):
         cities_section = self.settings['Cities']
@@ -329,4 +317,3 @@ class Game:
         for player in self.players:
             for i in range(cards_to_draw):
                 self.draw_card(player)
-
