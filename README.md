@@ -50,6 +50,12 @@ And for running test game session you can type:
 python3 pyndemic.py test/test_input.txt 42
 ```
 
+### Docker build & run
+```bash
+docker build -t pyndemic --rm .  
+docker run --rm -ti pyndemic  
+```
+
 ---
 ## From [Developer Zero][ref-user]
 **What is this?**
