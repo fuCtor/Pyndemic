@@ -11,3 +11,5 @@
 # Other
 *pycache*
 
+.coverage
+
